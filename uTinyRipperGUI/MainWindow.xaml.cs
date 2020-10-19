@@ -21,6 +21,8 @@ namespace uTinyRipperGUI
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private bool hasDefaultFile = false;
+
 		public static bool AssetSelector(Object asset)
 		{
 			return true;
@@ -36,6 +38,10 @@ namespace uTinyRipperGUI
 			string[] args = Environment.GetCommandLineArgs();
 			string[] files = args.Skip(1).ToArray();
 			ProcessInputFiles(files);
+
+			if (files.Length > 0) {
+				hasDefaultFile = true;
+			}
 		}
 
 		public static void OpenExplorerSelectFile(string path)
@@ -126,6 +132,12 @@ namespace uTinyRipperGUI
 #if VIRTUAL
 						OnExportButtonClicked(null, null);
 #endif
+						if (hasDefaultFile == true) {
+							string path = "E:/u3dTests/ShaderTemp/Ripped/";
+							IntroText.Text = "Exporting assets...";
+							ExportButton.Visibility = Visibility.Hidden;
+							ThreadPool.QueueUserWorkItem(new WaitCallback(ExportFiles), path);
+						}
 					}
 				);
 			}
@@ -190,6 +202,10 @@ namespace uTinyRipperGUI
 					ExportButton.Visibility = Visibility.Hidden;
 					PostExportButton.Visibility = Visibility.Visible;
 					ResetButton.Visibility = Visibility.Visible;
+
+					if (hasDefaultFile) {
+						OnExitButtonClicked(null, null);
+					}
 				}
 			);
 		}
